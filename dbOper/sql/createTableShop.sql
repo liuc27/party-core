@@ -14,5 +14,6 @@ CREATE TABLE IF NOT EXISTS SHOP
     	delFlg      	TINYINT(2) DEFAULT 0,
     	intro       	TEXT,
     	logo        	VARCHAR(1024),
+	imgList         TEXT,
 	UNIQUE(dispName)
 ) ENGINE=MyISAM DEFAULT CHARACTER SET=UTF8;

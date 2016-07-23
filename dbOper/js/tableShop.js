@@ -17,7 +17,7 @@ module.exports = Shop;
 function Shop () {
 	this.tableColumns = new Array("shopID", "owner", "name", "dispName", "address", "category", 
                 "administrator", "latitude", "longitude",
-		"insertDate", "updateDate", "delFlg","intro","logo"
+		"insertDate", "updateDate", "delFlg","intro","logo","imgList"
 	);
 	//this.neccessaryColumns = new Array("account");
 };
