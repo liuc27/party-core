@@ -6,9 +6,11 @@ var moment = require('moment');
 var tableName = "SHOP";
 var Common = require('./common.js');
 
-var myCon = my.createConnection(config);
+//var myCon = my.createConnection(config);
 //myCon.connect();
-var connected = false;
+//var connected = false;
+
+var pool = my.createPool(config);
 
 var common = new Common();
 
@@ -68,7 +70,7 @@ Shop.prototype.insertShop = function(shopInfo, callback) {
 		var sql = insertSql  + ";";
 		if (sql != undefined) {
 			console.log("insert sql is:" + sql);
-			myCon.connect(function(err,callback2){
+			/*myCon.connect(function(err,callback2){
 				connected = true;
 				myCon.query(sql, data, function(err, results){
 					if (connected == true) {
@@ -91,13 +93,41 @@ Shop.prototype.insertShop = function(shopInfo, callback) {
 						return;
 					}
 				});
-			});
+			});*/
+			pool.getConnection(function(err, conn) {
+                                if (err) {
+                                        var result = {
+                                                "code":0,
+                                                "msg":err
+                                        }
+                                        callback(result);
+                                        return;
+                                }
+                                conn.query(sql, data, function(err, results) {
+                                        conn.release();
+                                        if(err) {
+                                                var result = {
+                                                        "code":0,
+                                                        "msg":err
+                                                }
+                                                callback(result);
+                                                return;
+                                        } else {
+                                                var result = {
+                                                        "code":1,
+                                                        "msg":shopID
+                                                }
+                                                callback(result);
+                                                return;
+                                        }
+                                });
+                                /*conn.on('error', function(err) {
+                                        callback({"code" : 100, "status" : "Error in connection database"});
+                                        return;
+                                });*/
+                        });
 		}
 	} catch (e) {
-		if (connected == true) {
-			connected = false;
-			myCon.end();
-		}
 		if (e.stack) {
                         console.log("catch exception:" + e.name);
                         console.log(e.stack);
@@ -175,7 +205,7 @@ Shop.prototype.updateShop = function(shopInfo, callback) {
 		console.log("update sql:" + sql);
 		console.log(data);
 		if (sql != undefined) {
-			myCon.connect(function(err,callback2){
+			/*myCon.connect(function(err,callback2){
 				connected = true;
 				myCon.query(sql, data, function(err, results){
 					if (connected == true) {
@@ -198,13 +228,41 @@ Shop.prototype.updateShop = function(shopInfo, callback) {
 						return;
 					}
 				});
-			});
+			});*/
+			pool.getConnection(function(err, conn) {
+                                if (err) {
+                                        var result = {
+                                                "code":0,
+                                                "msg":err
+                                        }
+                                        callback(result);
+                                        return;
+                                }
+                                conn.query(sql, data, function(err, results) {
+                                        conn.release();
+                                        if(err) {
+                                                var result = {
+                                                        "code":0,
+                                                        "msg":err
+                                                }
+                                                callback(result);
+                                                return;
+                                        } else {
+                                                var result = {
+                                                        "code":1,
+                                                        "msg":"Success"
+                                                }
+                                                callback(result);
+                                                return;
+                                        }
+                                });
+                                /*conn.on('error', function(err) {
+                                        callback({"code" : 100, "status" : "Error in connection database"});
+                                        return;
+                                });*/
+                        });
 		}
 	} catch (e) {
-		if (connected == true) {
-			connected = false;
-			myCon.end();
-		}
 		if (e.stack) {
 			console.log("catch exception:" + e.name);
 			console.log(e.stack);
@@ -321,7 +379,7 @@ Shop.prototype.getShop = function(shopInfo, callback) {
                 }
 
 		console.log(sql);
-		myCon.connect(function(err,callback2){
+		/*myCon.connect(function(err,callback2){
 			connected = true;
 			myCon.query(sql, function(err, results){
 				if (connected == true) {
@@ -344,12 +402,40 @@ Shop.prototype.getShop = function(shopInfo, callback) {
 					return;
 				}
 			});
-		});
+		});*/
+		pool.getConnection(function(err, conn) {
+                        if (err) {
+                                var result = {
+                                        "code":0,
+                                        "msg":err
+                                }
+                                callback(result);
+                                return;
+                        }
+                        conn.query(sql, data, function(err, results) {
+                                conn.release();
+                                if(err) {
+                                        var result = {
+                                                "code":0,
+                                                "msg":err
+                                        }
+                                        callback(result);
+                                        return;
+                                } else {
+                                        var result = {
+                                                "code":1,
+                                                "Shop":results
+                                        }
+                                        callback(result);
+                                        return;
+                                }
+                        });
+                        /*conn.on('error', function(err) {
+                                callback({"code" : 100, "status" : "Error in connection database"});
+                                return;
+                        });*/
+                });
 	} catch (e) {
-		if (connected == true) {
-			connected = false;
-			myCon.end();
-		}
 		if (e.stack) {
                         console.log("catch exception:" + e.name);
                         console.log(e.stack);
@@ -380,7 +466,7 @@ Shop.prototype.searchShop = function(word, callback) {
                 var sql = 'SELECT * FROM SHOP WHERE intro like "' + "%" + word + "%" + '" OR dispName like "' + "%" + word + "%" + '"';
 
                 console.log(sql);
-                myCon.connect(function(err,callback2){
+                /*myCon.connect(function(err,callback2){
                         connected = true;
                         myCon.query(sql, function(err, results){
                                 if (connected == true) {
@@ -404,12 +490,40 @@ Shop.prototype.searchShop = function(word, callback) {
                                         return;
                                 }
                         });
+                });*/
+		pool.getConnection(function(err, conn) {
+                        if (err) {
+                                var result = {
+                                        "code":0,
+                                        "msg":err
+                                }
+                                callback(result);
+                                return;
+                        }
+                        conn.query(sql, data, function(err, results) {
+                                conn.release();
+                                if(err) {
+                                        var result = {
+                                                "code":0,
+                                                "msg":err
+                                        }
+                                        callback(result);
+                                        return;
+                                } else {
+                                        var result = {
+                                                "code":1,
+                                                "Shop":results
+                                        }
+                                        callback(result);
+                                        return;
+                                }
+                        });
+                        /*conn.on('error', function(err) {
+                                callback({"code" : 100, "status" : "Error in connection database"});
+                                return;
+                        });*/
                 });
 	} catch (e) {
-                if (connected == true) {
-                        connected = false;
-                        myCon.end();
-                }
                 if (e.stack) {
                         console.log("catch exception:" + e.name);
                         console.log(e.stack);

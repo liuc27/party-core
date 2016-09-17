@@ -6,9 +6,11 @@ var moment = require('moment');
 var tableName = "PURCHASE";
 var Common = require('./common.js');
 
-var myCon = my.createConnection(config);
+//var myCon = my.createConnection(config);
 //myCon.connect();
-var connected = false;
+//var connected = false;
+
+var pool = my.createPool(config);
 
 var common = new Common();
 
@@ -67,7 +69,7 @@ Purchase.prototype.insertPur = function(purInfo, callback) {
 		var sql = insertSql  + ";";
 		if (sql != undefined) {
 			console.log("insert sql is:" + sql);
-			myCon.connect(function(err,callback2){
+			/*myCon.connect(function(err,callback2){
 				connected = true;
 				myCon.query(sql, data, function(err, results){
 					if (connected == true) {
@@ -90,13 +92,41 @@ Purchase.prototype.insertPur = function(purInfo, callback) {
 						return;
 					}
 				});
-			});
+			});*/
+			pool.getConnection(function(err, conn) {
+                                if (err) {
+                                        var result = {
+                                                "code":0,
+                                                "msg":err
+                                        }
+                                        callback(result);
+                                        return;
+                                }
+                                conn.query(sql, data, function(err, results) {
+                                        conn.release();
+                                        if(err) {
+                                                var result = {
+                                                        "code":0,
+                                                        "msg":err
+                                                }
+                                                callback(result);
+                                                return;
+                                        } else {
+                                                var result = {
+                                                        "code":1,
+                                                        "msg":purchaseID
+                                                }
+                                                callback(result);
+                                                return;
+                                        }
+                                });
+                                /*conn.on('error', function(err) {
+                                        callback({"code" : 100, "status" : "Error in connection database"});
+                                        return;
+                                });*/
+                        });
 		}
 	} catch (e) {
-		if (connected == true) {
-			connected = false;
-			myCon.end();
-		}
 		if (e.stack) {
                         console.log("catch exception:" + e.name);
                         console.log(e.stack);
@@ -174,7 +204,7 @@ Purchase.prototype.updatePur = function(purInfo, callback) {
 		console.log("update sql:" + sql);
 		console.log(data);
 		if (sql != undefined) {
-			myCon.connect(function(err,callback2){
+			/*myCon.connect(function(err,callback2){
 				connected = true;
 				myCon.query(sql, data, function(err, results){
 					if (connected == true) {
@@ -197,13 +227,41 @@ Purchase.prototype.updatePur = function(purInfo, callback) {
 						return;
 					}
 				});
-			});
+			});*/
+			pool.getConnection(function(err, conn) {
+                                if (err) {
+                                        var result = {
+                                                "code":0,
+                                                "msg":err
+                                        }
+                                        callback(result);
+                                        return;
+                                }
+                                conn.query(sql, data, function(err, results) {
+                                        conn.release();
+                                        if(err) {
+                                                var result = {
+                                                        "code":0,
+                                                        "msg":err
+                                                }
+                                                callback(result);
+                                                return;
+                                        } else {
+                                                var result = {
+                                                        "code":1,
+                                                        "msg":"Success"
+                                                }
+                                                callback(result);
+                                                return;
+                                        }
+                                });
+                                /*conn.on('error', function(err) {
+                                        callback({"code" : 100, "status" : "Error in connection database"});
+                                        return;
+                                });*/
+                        });
 		}
 	} catch (e) {
-		if (connected == true) {
-			connected = false;
-			myCon.end();
-		}
 		if (e.stack) {
 			console.log("catch exception:" + e.name);
 			console.log(e.stack);
@@ -287,7 +345,7 @@ Purchase.prototype.getPur = function(purInfo, callback) {
                 }
 
 		console.log(sql);
-		myCon.connect(function(err,callback2){
+		/*myCon.connect(function(err,callback2){
 			connected = true;
 			myCon.query(sql, function(err, results){
 				if (connected == true) {
@@ -310,12 +368,40 @@ Purchase.prototype.getPur = function(purInfo, callback) {
 					return;
 				}
 			});
-		});
+		});*/
+		pool.getConnection(function(err, conn) {
+                        if (err) {
+                                var result = {
+                                        "code":0,
+                                        "msg":err
+                                }
+                                callback(result);
+                                return;
+                        }
+                        conn.query(sql, data, function(err, results) {
+                                conn.release();
+                                if(err) {
+                                        var result = {
+                                                "code":0,
+                                                "msg":err
+                                        }
+                                        callback(result);
+                                        return;
+                                } else {
+                                        var result = {
+                                                "code":1,
+                                                "Purchase":results
+                                        }
+                                        callback(result);
+                                        return;
+                                }
+                        });
+                        /*conn.on('error', function(err) {
+                                callback({"code" : 100, "status" : "Error in connection database"});
+                                return;
+                        });*/
+                });
 	} catch (e) {
-		if (connected == true) {
-			connected = false;
-			myCon.end();
-		}
 		if (e.stack) {
                         console.log("catch exception:" + e.name);
                         console.log(e.stack);
