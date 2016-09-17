@@ -5,6 +5,7 @@ compression = require "compression"
 bodyParser = require "body-parser"
 moment = require "moment"
 helmet = require "helmet"
+cors = require "cors"
 
 app = express()
 server = http.createServer app
@@ -24,6 +25,9 @@ app.use compression
 app.use bodyParser.json()
 app.use bodyParser.urlencoded
   extended: true
+
+# Cross domain 対策
+app.use cors()
 
 files = []
 for val in fs.readdirSync "./app"
