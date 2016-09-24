@@ -19,10 +19,11 @@ module.exports = User;
 
 function User () {
 	this.tableColumns = new Array("account", "password", "name", "nickName", "phone", "address",
-		"postNum", "email", "birthday", "oauthSource", "birthday", "adminFlg", "certificatedFlg", 
+		"postNum", "email", "birthday", "oauthSource",  "adminFlg", "certificatedFlg", 
 		"gender", "deliverAddress", "currentDeliverAddr", "intro", "image", "point", "idCard",
 		"insertDate", "updateDate", "delFlg"
 	);
+	this.selectColumns = "userID, account, name, nickName, phone, address, postNum, email, birthday, oauthSource, adminFlg, certificatedFlg, gender, deliverAddress, currentDeliverAddr, intro, image, point, idCard, insertDate, updateDate, delFlg";
 	//this.neccessaryColumns = new Array("account");
 };
 
@@ -297,7 +298,7 @@ User.prototype.getUser = function(userInfo, callback) {
 		}*/
 
 		var sql = undefined;
-		var selectSql = "SELECT * FROM USER";
+		var selectSql = "SELECT " + this.selectColumns + " FROM USER";
 		var whereSql = undefined;
 		if (objUser.userID != undefined) {
 			whereSql = " WHERE userID=" + '"' + objUser.userID + '"';
@@ -540,7 +541,7 @@ User.prototype.searchUser = function(word, callback) {
                         return;
                 }
 
-		var sql = 'SELECT * FROM USER WHERE intro like "' + "%" + word + "%" + '" OR nickName like "' + "%" + word + "%" + '"';
+		var sql = 'SELECT ' + this.selectColumns + ' FROM USER WHERE intro like "' + "%" + word + "%" + '" OR nickName like "' + "%" + word + "%" + '"';
 
 		console.log("SQL:" + sql);
                 /*myCon.connect(function(err,callback2){
@@ -628,7 +629,7 @@ User.prototype.login = function(userInfo, callback) {
 			return;
 		}
 
-		var sql = 'SELECT count(*) as count FROM USER WHERE account="' + objUser.account + '" AND password="' + objUser.password + '";';
+		var sql = 'SELECT userID,account,name,nickName FROM USER WHERE account="' + objUser.account + '" AND password="' + objUser.password + '";';
 		/*myCon.connect(function(err,callback2){
 			connected = true;
 			myCon.query(sql, function(err, results){
@@ -674,6 +675,7 @@ User.prototype.login = function(userInfo, callback) {
                          }
                          conn.query(sql, function(err, results) {
                                 conn.release();
+				console.log(results);
                                 if(err) {
 					var result = {
                                                 "code":0,
@@ -682,18 +684,21 @@ User.prototype.login = function(userInfo, callback) {
                                         callback(result);
                                         return;
 				} else {
-					var dbRet = JSON.stringify(results);
-                                        var jsonObj = JSON.parse(dbRet);
                                         var result = undefined;
-                                        if (jsonObj[0].count == "0") {
+                                        if (results.length == 0) {
                                                 result = {
                                                         "code":0,
                                                         "msg":"account or password is wrong"
                                                 }
-                                        } else {
+                                        } else if (results.length > 1) {
+						result = {
+							"code":0,
+							"msg":"two account are found"
+						}
+					} else {
                                                 result = {
                                                         "code":1,
-                                                        "msg":"login success"
+                                                        "User":results
                                                 }
                                         }
                                         callback(result);

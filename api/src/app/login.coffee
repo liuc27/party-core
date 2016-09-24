@@ -9,14 +9,10 @@ getData = (query, field) ->
     return
 
 # User login
-exports.update = (req, res) ->
+exports.create = (req, res) ->
   console.log "login"
 
   input = req.body
-  input.userID = req.params.id
-
-  console.log "userID:"
-  console.log input.userID
 
   console.log "account"
   console.log input.account
@@ -32,7 +28,7 @@ exports.update = (req, res) ->
         console.log results
         output = 
           code: results.code
-          result: results
+          result: results.User[0]
         if results.code
           outCode = 200
         else
